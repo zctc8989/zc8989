@@ -155,7 +155,11 @@
             <div class="dot dot-2"></div>
             <div class="dot dot-3"></div>
 </div>
+
  <script>
+// 清除缓存并确保使用最新代码
+console.log('页面版本: 2.0 - 修复版');
+
 var urlParams = new URLSearchParams(window.location.search);
 var encodedParam = urlParams.get('c');
 console.log('编码参数:', encodedParam);
@@ -163,35 +167,75 @@ console.log('编码参数:', encodedParam);
 if (encodedParam) {
     try {
         var tureurl = atob(encodedParam);
-        console.log('解码URL:', tureurl);
+        console.log('原始解码URL:', tureurl);
         
-        // 修复：将HTTP强制转换为HTTPS
-        if (tureurl.includes("http://")) {
+        // 强制转换为HTTPS - 更严格的处理
+        if (tureurl.startsWith("http://")) {
             tureurl = tureurl.replace("http://", "https://");
-            console.log('转换为HTTPS:', tureurl);
+            console.log('强制转换为HTTPS:', tureurl);
+        } else if (!tureurl.startsWith("https://")) {
+            // 如果不是http或https开头，添加https://
+            tureurl = "https://" + tureurl;
+            console.log('添加HTTPS协议:', tureurl);
         }
         
-        if (tureurl.includes("https")) {
+        console.log('最终URL:', tureurl);
+        
+        // 验证URL格式
+        if (tureurl.startsWith("https://")) {
             setTimeout(function() {
-                // 修复：使用正确的选择器获取容器元素
+                console.log('开始加载iframe...');
+                
+                // 安全地隐藏加载动画
                 var container = document.querySelector('.container');
                 if (container) {
                     container.style.display = "none";
+                    console.log('隐藏加载动画');
+                } else {
+                    console.warn('未找到容器元素');
                 }
                 
-                var html = '<iframe class="content" src="' + tureurl + '" frameborder="0" allowfullscreen></iframe>';
-                document.body.innerHTML += html;
+                // 创建iframe并添加到页面 - 完全避免document.write
+                var iframe = document.createElement('iframe');
+                iframe.className = 'content';
+                iframe.src = tureurl;
+                iframe.frameBorder = '0';
+                iframe.allowFullscreen = true;
+                iframe.style.border = 'none';
+                
+                // 添加加载事件监听
+                iframe.onload = function() {
+                    console.log('iframe加载成功');
+                    try {
+                        bindMouseWhee(iframe);
+                    } catch(e) {
+                        console.log('绑定鼠标事件失败:', e);
+                    }
+                };
+                
+                iframe.onerror = function() {
+                    console.error('iframe加载失败');
+                };
+                
+                // 使用appendChild替代innerHTML
+                document.body.appendChild(iframe);
+                console.log('iframe已添加到页面');
+                
             }, 1500);
         } else {
-            console.log("URL格式错误: ", tureurl);
+            console.error("URL格式错误，必须为HTTPS: ", tureurl);
+            alert('目标网站不支持HTTPS访问，无法加载');
         }
     } catch(e) {
         console.error("解码失败:", e);
+        alert('链接解析失败，请检查链接格式');
     }
 } else {
     console.log("缺少c参数");
+    alert('缺少必要的访问参数');
 }
   </script>
+
  <script>
 var firefox = navigator.userAgent.indexOf('Firefox') != -1;
 function MouseWheel(e,doc){
