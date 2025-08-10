@@ -147,6 +147,18 @@
         }
     }
    .content{height:100%;width:100%;position: fixed;left: -2px;top: -2px;}
+   .warning-message {
+        position: fixed;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: #ff6b6b;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 5px;
+        z-index: 1000;
+        font-size: 14px;
+    }
 </style>
 <body>
 
@@ -158,7 +170,7 @@
 
  <script>
 // 清除缓存并确保使用最新代码
-console.log('页面版本: 2.0 - 修复版');
+console.log('页面版本: 3.0 - 支持HTTP/HTTPS自适应');
 
 var urlParams = new URLSearchParams(window.location.search);
 var encodedParam = urlParams.get('c');
@@ -169,70 +181,141 @@ if (encodedParam) {
         var tureurl = atob(encodedParam);
         console.log('原始解码URL:', tureurl);
         
-        // 强制转换为HTTPS - 更严格的处理
-        if (tureurl.startsWith("http://")) {
-            tureurl = tureurl.replace("http://", "https://");
-            console.log('强制转换为HTTPS:', tureurl);
-        } else if (!tureurl.startsWith("https://")) {
-            // 如果不是http或https开头，添加https://
-            tureurl = "https://" + tureurl;
-            console.log('添加HTTPS协议:', tureurl);
+        // 检测当前页面协议
+        var currentProtocol = window.location.protocol;
+        console.log('当前页面协议:', currentProtocol);
+        
+        // 确保URL有协议前缀
+        if (!tureurl.startsWith('http://') && !tureurl.startsWith('https://')) {
+            tureurl = 'http://' + tureurl;
+            console.log('添加HTTP协议:', tureurl);
         }
         
-        console.log('最终URL:', tureurl);
+        // 智能协议适配
+        var finalUrl = tureurl;
+        var useHttps = currentProtocol === 'https:';
         
-        // 验证URL格式
-        if (tureurl.startsWith("https://")) {
-            setTimeout(function() {
-                console.log('开始加载iframe...');
-                
-                // 安全地隐藏加载动画
-                var container = document.querySelector('.container');
-                if (container) {
-                    container.style.display = "none";
-                    console.log('隐藏加载动画');
-                } else {
-                    console.warn('未找到容器元素');
+        if (useHttps && tureurl.startsWith('http://')) {
+            // 尝试HTTPS版本
+            var httpsUrl = tureurl.replace('http://', 'https://');
+            console.log('尝试HTTPS版本:', httpsUrl);
+            
+            // 先尝试HTTPS，如果失败再回退到HTTP
+            finalUrl = httpsUrl;
+        }
+        
+        console.log('最终URL:', finalUrl);
+        
+        setTimeout(function() {
+            console.log('开始加载iframe...');
+            
+            // 安全地隐藏加载动画
+            var container = document.querySelector('.container');
+            if (container) {
+                container.style.display = "none";
+                console.log('隐藏加载动画');
+            } else {
+                console.warn('未找到容器元素');
+            }
+            
+            // 创建iframe
+            var iframe = document.createElement('iframe');
+            iframe.className = 'content';
+            iframe.src = finalUrl;
+            iframe.frameBorder = '0';
+            iframe.allowFullscreen = true;
+            iframe.style.border = 'none';
+            
+            // 加载成功处理
+            iframe.onload = function() {
+                console.log('iframe加载成功');
+                try {
+                    bindMouseWhee(iframe);
+                } catch(e) {
+                    console.log('绑定鼠标事件失败:', e);
                 }
+            };
+            
+            // 加载失败处理 - 尝试回退到HTTP
+            iframe.onerror = function() {
+                console.warn('iframe加载失败，尝试回退到HTTP');
                 
-                // 创建iframe并添加到页面 - 完全避免document.write
-                var iframe = document.createElement('iframe');
-                iframe.className = 'content';
-                iframe.src = tureurl;
-                iframe.frameBorder = '0';
-                iframe.allowFullscreen = true;
-                iframe.style.border = 'none';
-                
-                // 添加加载事件监听
-                iframe.onload = function() {
-                    console.log('iframe加载成功');
-                    try {
-                        bindMouseWhee(iframe);
-                    } catch(e) {
-                        console.log('绑定鼠标事件失败:', e);
+                if (useHttps && finalUrl.startsWith('https://')) {
+                    // 移除失败的iframe
+                    if (iframe.parentNode) {
+                        iframe.parentNode.removeChild(iframe);
                     }
-                };
-                
-                iframe.onerror = function() {
+                    
+                    // 显示警告信息
+                    showWarning('HTTPS加载失败，正在尝试HTTP版本...');
+                    
+                    // 尝试HTTP版本
+                    setTimeout(function() {
+                        var httpUrl = finalUrl.replace('https://', 'http://');
+                        console.log('尝试HTTP版本:', httpUrl);
+                        
+                        var newIframe = document.createElement('iframe');
+                        newIframe.className = 'content';
+                        newIframe.src = httpUrl;
+                        newIframe.frameBorder = '0';
+                        newIframe.allowFullscreen = true;
+                        newIframe.style.border = 'none';
+                        
+                        newIframe.onload = function() {
+                            console.log('HTTP版本加载成功');
+                            hideWarning();
+                            try {
+                                bindMouseWhee(newIframe);
+                            } catch(e) {
+                                console.log('绑定鼠标事件失败:', e);
+                            }
+                        };
+                        
+                        newIframe.onerror = function() {
+                            console.error('HTTP版本也加载失败');
+                            showWarning('目标网站无法访问，请检查URL是否正确');
+                        };
+                        
+                        document.body.appendChild(newIframe);
+                    }, 1000);
+                } else {
                     console.error('iframe加载失败');
-                };
-                
-                // 使用appendChild替代innerHTML
-                document.body.appendChild(iframe);
-                console.log('iframe已添加到页面');
-                
-            }, 1500);
-        } else {
-            console.error("URL格式错误，必须为HTTPS: ", tureurl);
-            alert('目标网站不支持HTTPS访问，无法加载');
-        }
+                    showWarning('目标网站无法访问，请检查URL是否正确');
+                }
+            };
+            
+            document.body.appendChild(iframe);
+            console.log('iframe已添加到页面');
+            
+        }, 1500);
     } catch(e) {
         console.error("解码失败:", e);
-        alert('链接解析失败，请检查链接格式');
+        showWarning('链接解析失败，请检查链接格式');
     }
 } else {
     console.log("缺少c参数");
-    alert('缺少必要的访问参数');
+    showWarning('缺少必要的访问参数');
+}
+
+// 显示警告信息
+function showWarning(message) {
+    var existingWarning = document.querySelector('.warning-message');
+    if (existingWarning) {
+        existingWarning.textContent = message;
+    } else {
+        var warning = document.createElement('div');
+        warning.className = 'warning-message';
+        warning.textContent = message;
+        document.body.appendChild(warning);
+    }
+}
+
+// 隐藏警告信息
+function hideWarning() {
+    var warning = document.querySelector('.warning-message');
+    if (warning) {
+        warning.parentNode.removeChild(warning);
+    }
 }
   </script>
 
