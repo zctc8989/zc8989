@@ -5,7 +5,6 @@
   <meta content="yes" name="apple-touch-fullscreen">
   <meta content="black" name="apple-mobile-web-app-status-bar-style">
   <meta content="320" name="MobileOptimized">
-  <meta name="mobile-web-app-capable" content="yes">
   <title></title>
 <style>
 .container {
@@ -146,179 +145,166 @@
             transform: translate(-50%, -50%) rotate(360deg)
         }
     }
-   .content{height:100%;width:100%;position: fixed;left: -2px;top: -2px;}
-   .warning-message {
-        position: fixed;
-        top: 20px;
+.container {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        top: 50%;
         left: 50%;
-        transform: translateX(-50%);
-        background: #ff6b6b;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 5px;
-        z-index: 1000;
-        font-size: 14px;
+        transform: translate(-50%, -50%);
     }
+
+    .dot {
+        width: 15px;
+        height: 15px;
+        border-radius: 50%;
+        background-color: #000;
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        margin: auto;
+    }
+
+    .dot-3 {
+        background-color: #f74d75;
+    }
+
+    .dot-2 {
+        background-color: #10beae;
+    }
+
+    .dot-1 {
+        background-color: #ffe386;
+    }
+
+    .dot-3 {
+        background-color: #f74d75;
+        animation: dot-3-move 2s ease infinite;
+    }
+
+    @keyframes dot-3-move {
+        20% {
+            transform: scale(1)
+        }
+
+        45% {
+            transform: translateY(-18px) scale(.45)
+        }
+
+        60% {
+            transform: translateY(-25px) scale(.45)
+        }
+
+        80% {
+            transform: translateY(-25px) scale(.45)
+        }
+
+        100% {
+            transform: translateY(0px) scale(1)
+        }
+    }
+
+    .dot-2 {
+        background-color: #10beae;
+        animation: dot-2-move 2s ease infinite;
+    }
+
+    .dot-1 {
+        background-color: #ffe386;
+        animation: dot-1-move 2s ease infinite;
+    }
+
+    @keyframes dot-2-move {
+        20% {
+            transform: scale(1)
+        }
+
+        45% {
+            transform: translate(-16px, 12px) scale(.45)
+        }
+
+        60% {
+            transform: translate(-20px, 15px) scale(.45)
+        }
+
+        80% {
+            transform: translate(-20px, 15px) scale(.45)
+        }
+
+        100% {
+            transform: translateY(0px) scale(1)
+        }
+    }
+
+    @keyframes dot-1-move {
+        20% {
+            transform: scale(1)
+        }
+
+        45% {
+            transform: translate(16px, 12px) scale(.45)
+        }
+
+        60% {
+            transform: translate(20px, 15px) scale(.45)
+        }
+
+        80% {
+            transform: translate(20px, 15px) scale(.45)
+        }
+
+        100% {
+            transform: translateY(0px) scale(1)
+        }
+    }
+
+    .container {
+        width: 100px;
+        height: 100px;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+ 
+    }
+
+    @keyframes rotate-move {
+        55% {
+            transform: translate(-50%, -50%) rotate(0deg)
+        }
+
+        80% {
+            transform: translate(-50%, -50%) rotate(360deg)
+        }
+
+        100% {
+            transform: translate(-50%, -50%) rotate(360deg)
+        }
+    }
+   .content{height:100%;width:100%;position: fixed;left: -2px;top: -2px;}
 </style>
 <body>
 
 <div class="container">
-            <div class="dot dot-1"></div>
-            <div class="dot dot-2"></div>
-            <div class="dot dot-3"></div>
+           
 </div>
-
  <script>
-// 清除缓存并确保使用最新代码
-console.log('页面版本: 3.0 - 支持HTTP/HTTPS自适应');
-
-var urlParams = new URLSearchParams(window.location.search);
-var encodedParam = urlParams.get('c');
-console.log('编码参数:', encodedParam);
-
-if (encodedParam) {
-    try {
-        var tureurl = atob(encodedParam);
-        console.log('原始解码URL:', tureurl);
-        
-        // 检测当前页面协议
-        var currentProtocol = window.location.protocol;
-        console.log('当前页面协议:', currentProtocol);
-        
-        // 确保URL有协议前缀
-        if (!tureurl.startsWith('http://') && !tureurl.startsWith('https://')) {
-            tureurl = 'http://' + tureurl;
-            console.log('添加HTTP协议:', tureurl);
-        }
-        
-        // 智能协议适配
-        var finalUrl = tureurl;
-        var useHttps = currentProtocol === 'https:';
-        
-        if (useHttps && tureurl.startsWith('http://')) {
-            // 尝试HTTPS版本
-            var httpsUrl = tureurl.replace('http://', 'https://');
-            console.log('尝试HTTPS版本:', httpsUrl);
-            
-            // 先尝试HTTPS，如果失败再回退到HTTP
-            finalUrl = httpsUrl;
-        }
-        
-        console.log('最终URL:', finalUrl);
-        
-        setTimeout(function() {
-            console.log('开始加载iframe...');
-            
-            // 安全地隐藏加载动画
-            var container = document.querySelector('.container');
-            if (container) {
-                container.style.display = "none";
-                console.log('隐藏加载动画');
-            } else {
-                console.warn('未找到容器元素');
-            }
-            
-            // 创建iframe
-            var iframe = document.createElement('iframe');
-            iframe.className = 'content';
-            iframe.src = finalUrl;
-            iframe.frameBorder = '0';
-            iframe.allowFullscreen = true;
-            iframe.style.border = 'none';
-            
-            // 加载成功处理
-            iframe.onload = function() {
-                console.log('iframe加载成功');
-                try {
-                    bindMouseWhee(iframe);
-                } catch(e) {
-                    console.log('绑定鼠标事件失败:', e);
-                }
-            };
-            
-            // 加载失败处理 - 尝试回退到HTTP
-            iframe.onerror = function() {
-                console.warn('iframe加载失败，尝试回退到HTTP');
-                
-                if (useHttps && finalUrl.startsWith('https://')) {
-                    // 移除失败的iframe
-                    if (iframe.parentNode) {
-                        iframe.parentNode.removeChild(iframe);
-                    }
-                    
-                    // 显示警告信息
-                    showWarning('HTTPS加载失败，正在尝试HTTP版本...');
-                    
-                    // 尝试HTTP版本
-                    setTimeout(function() {
-                        var httpUrl = finalUrl.replace('https://', 'http://');
-                        console.log('尝试HTTP版本:', httpUrl);
-                        
-                        var newIframe = document.createElement('iframe');
-                        newIframe.className = 'content';
-                        newIframe.src = httpUrl;
-                        newIframe.frameBorder = '0';
-                        newIframe.allowFullscreen = true;
-                        newIframe.style.border = 'none';
-                        
-                        newIframe.onload = function() {
-                            console.log('HTTP版本加载成功');
-                            hideWarning();
-                            try {
-                                bindMouseWhee(newIframe);
-                            } catch(e) {
-                                console.log('绑定鼠标事件失败:', e);
-                            }
-                        };
-                        
-                        newIframe.onerror = function() {
-                            console.error('HTTP版本也加载失败');
-                            showWarning('目标网站无法访问，请检查URL是否正确');
-                        };
-                        
-                        document.body.appendChild(newIframe);
-                    }, 1000);
-                } else {
-                    console.error('iframe加载失败');
-                    showWarning('目标网站无法访问，请检查URL是否正确');
-                }
-            };
-            
-            document.body.appendChild(iframe);
-            console.log('iframe已添加到页面');
-            
-        }, 1500);
-    } catch(e) {
-        console.error("解码失败:", e);
-        showWarning('链接解析失败，请检查链接格式');
-    }
+var liugao = new URLSearchParams(window.location.search);
+var encodedParam = liugao.get('c');
+var liu = atob(encodedParam);
+if (liu.includes("http")) {
+var square = document.getElementById("container");
+setTimeout(function() {
+  square.style.display = "none";
+}, 1500);
+ var html='<iframe class="content" οnlοad="bindMouseWhee(this)" src='+liu+'></iframe>';
+  document.writeln(html);
+console.log(liu);
 } else {
-    console.log("缺少c参数");
-    showWarning('缺少必要的访问参数');
-}
-
-// 显示警告信息
-function showWarning(message) {
-    var existingWarning = document.querySelector('.warning-message');
-    if (existingWarning) {
-        existingWarning.textContent = message;
-    } else {
-        var warning = document.createElement('div');
-        warning.className = 'warning-message';
-        warning.textContent = message;
-        document.body.appendChild(warning);
-    }
-}
-
-// 隐藏警告信息
-function hideWarning() {
-    var warning = document.querySelector('.warning-message');
-    if (warning) {
-        warning.parentNode.removeChild(warning);
-    }
+  console.log("nourls");
 }
   </script>
-
  <script>
 var firefox = navigator.userAgent.indexOf('Firefox') != -1;
 function MouseWheel(e,doc){
@@ -331,295 +317,7 @@ function bindMouseWhee(ifr){
 		var doc = ifr.contentWindow.document;
 		firefox?doc.addEventListener('DOMMouseScroll',function(e){MouseWheel(e,doc)},false):(doc.onmousewheel = function(e){MouseWheel(e||ifr.contentWindow.event,doc)});
 	}catch(e){
-		console.log('跨域无法获取iframe加载document', e);
+		alert('跨域无法获取iframe加载document'+e);
 	}
 }
 </script> 
-</body>
-</html>
-
-<!-- 在现有代码基础上添加管理功能 -->
-<script>
-// 清除缓存并确保使用最新代码
-console.log('页面版本: 4.0 - 推广链接管理系统');
-
-// 落地页配置 - 可以随时修改这里的目标URL
-var landingPages = {
-    // 默认落地页
-    'default': 'http://zc.hdfghdf.shop/t/ZkDXejHv.html',
-    
-    // 备用落地页
-    'backup1': 'http://example.com/page1',
-    'backup2': 'http://example.com/page2',
-    
-    // A/B测试页面
-    'test_a': 'http://example.com/test-a',
-    'test_b': 'http://example.com/test-b'
-};
-
-// 当前使用的落地页策略
-var currentStrategy = 'default'; // 可以改为 'backup1', 'test_a' 等
-
-// 访问统计
-var visitStats = {
-    total: 0,
-    today: 0,
-    lastUpdate: new Date().toDateString()
-};
-
-// 从URL获取参数
-var urlParams = new URLSearchParams(window.location.search);
-var encodedParam = urlParams.get('c');
-var source = urlParams.get('source') || 'unknown'; // 推广来源
-
-console.log('推广来源:', source);
-console.log('编码参数:', encodedParam);
-
-// 更新访问统计
-function updateStats() {
-    visitStats.total++;
-    
-    var today = new Date().toDateString();
-    if (visitStats.lastUpdate !== today) {
-        visitStats.today = 1;
-        visitStats.lastUpdate = today;
-    } else {
-        visitStats.today++;
-    }
-    
-    console.log('访问统计:', visitStats);
-    
-    // 这里可以添加发送统计数据到服务器的代码
-    // sendStatsToServer(visitStats, source);
-}
-
-// A/B测试逻辑
-function getABTestPage() {
-    // 简单的50/50分流
-    return Math.random() < 0.5 ? 'test_a' : 'test_b';
-}
-
-// 根据条件选择落地页
-function selectLandingPage() {
-    // 如果有指定参数，使用参数中的页面
-    if (encodedParam) {
-        try {
-            var customUrl = atob(encodedParam);
-            console.log('使用自定义URL:', customUrl);
-            return customUrl;
-        } catch(e) {
-            console.error('自定义URL解码失败:', e);
-        }
-    }
-    
-    // A/B测试模式
-    if (urlParams.get('abtest') === 'true') {
-        return landingPages[getABTestPage()];
-    }
-    
-    // 根据来源选择不同的落地页
-    if (source === 'social') {
-        return landingPages['test_a'];
-    } else if (source === 'email') {
-        return landingPages['test_b'];
-    }
-    
-    // 使用默认策略
-    return landingPages[currentStrategy];
-}
-
-// 主要逻辑
-if (encodedParam || landingPages[currentStrategy]) {
-    try {
-        // 更新统计
-        updateStats();
-        
-        // 选择落地页
-        var tureurl = selectLandingPage();
-        console.log('选择的落地页:', tureurl);
-        
-        // 检测当前页面协议
-        var currentProtocol = window.location.protocol;
-        console.log('当前页面协议:', currentProtocol);
-        
-        // 确保URL有协议前缀
-        if (!tureurl.startsWith('http://') && !tureurl.startsWith('https://')) {
-            tureurl = 'http://' + tureurl;
-            console.log('添加HTTP协议:', tureurl);
-        }
-        
-        // 智能协议适配
-        var finalUrl = tureurl;
-        var useHttps = currentProtocol === 'https:';
-        
-        if (useHttps && tureurl.startsWith('http://')) {
-            var httpsUrl = tureurl.replace('http://', 'https://');
-            console.log('尝试HTTPS版本:', httpsUrl);
-            finalUrl = httpsUrl;
-        }
-        
-        console.log('最终URL:', finalUrl);
-        
-        setTimeout(function() {
-            console.log('开始加载落地页...');
-            
-            // 安全地隐藏加载动画
-            var container = document.querySelector('.container');
-            if (container) {
-                container.style.display = "none";
-                console.log('隐藏加载动画');
-            }
-            
-            // 创建iframe
-            var iframe = document.createElement('iframe');
-            iframe.className = 'content';
-            iframe.src = finalUrl;
-            iframe.frameBorder = '0';
-            iframe.allowFullscreen = true;
-            iframe.style.border = 'none';
-            
-            // 加载成功处理
-            iframe.onload = function() {
-                console.log('落地页加载成功');
-                try {
-                    bindMouseWhee(iframe);
-                } catch(e) {
-                    console.log('绑定鼠标事件失败:', e);
-                }
-            };
-            
-            // 加载失败处理
-            iframe.onerror = function() {
-                console.warn('落地页加载失败，尝试备用页面');
-                
-                if (useHttps && finalUrl.startsWith('https://')) {
-                    if (iframe.parentNode) {
-                        iframe.parentNode.removeChild(iframe);
-                    }
-                    
-                    showWarning('HTTPS加载失败，正在尝试HTTP版本...');
-                    
-                    setTimeout(function() {
-                        var httpUrl = finalUrl.replace('https://', 'http://');
-                        console.log('尝试HTTP版本:', httpUrl);
-                        
-                        var newIframe = document.createElement('iframe');
-                        newIframe.className = 'content';
-                        newIframe.src = httpUrl;
-                        newIframe.frameBorder = '0';
-                        newIframe.allowFullscreen = true;
-                        newIframe.style.border = 'none';
-                        
-                        newIframe.onload = function() {
-                            console.log('HTTP版本加载成功');
-                            hideWarning();
-                            try {
-                                bindMouseWhee(newIframe);
-                            } catch(e) {
-                                console.log('绑定鼠标事件失败:', e);
-                            }
-                        };
-                        
-                        newIframe.onerror = function() {
-                            console.error('所有版本都加载失败，尝试备用落地页');
-                            
-                            // 尝试备用落地页
-                            var backupUrl = landingPages['backup1'];
-                            if (backupUrl && backupUrl !== finalUrl) {
-                                showWarning('正在尝试备用落地页...');
-                                
-                                setTimeout(function() {
-                                    var backupIframe = document.createElement('iframe');
-                                    backupIframe.className = 'content';
-                                    backupIframe.src = backupUrl;
-                                    backupIframe.frameBorder = '0';
-                                    backupIframe.allowFullscreen = true;
-                                    backupIframe.style.border = 'none';
-                                    
-                                    backupIframe.onload = function() {
-                                        console.log('备用落地页加载成功');
-                                        hideWarning();
-                                        try {
-                                            bindMouseWhee(backupIframe);
-                                        } catch(e) {
-                                            console.log('绑定鼠标事件失败:', e);
-                                        }
-                                    };
-                                    
-                                    backupIframe.onerror = function() {
-                                        console.error('备用落地页也加载失败');
-                                        showWarning('所有落地页都无法访问，请稍后再试');
-                                    };
-                                    
-                                    document.body.appendChild(backupIframe);
-                                }, 1000);
-                            } else {
-                                showWarning('所有落地页都无法访问，请稍后再试');
-                            }
-                        };
-                        
-                        document.body.appendChild(newIframe);
-                    }, 1000);
-                } else {
-                    console.error('落地页加载失败');
-                    showWarning('落地页无法访问，请稍后再试');
-                }
-            };
-            
-            document.body.appendChild(iframe);
-            console.log('落地页iframe已添加到页面');
-            
-        }, 1500);
-    } catch(e) {
-        console.error("处理失败:", e);
-        showWarning('系统错误，请稍后再试');
-    }
-} else {
-    console.log("没有可用的落地页配置");
-    showWarning('推广链接配置错误');
-}
-
-// 显示警告信息
-function showWarning(message) {
-    var existingWarning = document.querySelector('.warning-message');
-    if (existingWarning) {
-        existingWarning.textContent = message;
-    } else {
-        var warning = document.createElement('div');
-        warning.className = 'warning-message';
-        warning.textContent = message;
-        document.body.appendChild(warning);
-    }
-}
-
-// 隐藏警告信息
-function hideWarning() {
-    var warning = document.querySelector('.warning-message');
-    if (warning) {
-        warning.parentNode.removeChild(warning);
-    }
-}
-
-// 发送统计数据到服务器（示例）
-function sendStatsToServer(stats, source) {
-    // 这里可以添加AJAX请求发送数据到你的统计服务器
-    console.log('发送统计数据:', { stats: stats, source: source });
-    
-    /*
-    fetch('https://your-stats-server.com/api/track', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            stats: stats,
-            source: source,
-            timestamp: new Date().toISOString()
-        })
-    })
-    .then(response => response.json())
-    .then(data => console.log('统计数据发送成功:', data))
-    .catch(error => console.error('统计数据发送失败:', error));
-    */
-}
-</script>
